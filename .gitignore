@@ -1,0 +1,19 @@
+# Local backup files (never commit these — they contain real data!)
+*.dump
+*.sql
+*.backup
+
+# Env files
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*~
