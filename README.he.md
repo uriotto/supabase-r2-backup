@@ -106,4 +106,4 @@ MIT. חופשי לעתק, להתאים.
 
 ## קרדיטים
 
-נוצר בהשראת [המדריך הזה לגיבוי עצמאי של Supabase](https://github.com/cucoleadan/supabase-to-r2-backup) (מאי 2026). היישום הזה נבנה ונבדק ב-production על ידי [@uriotto](https://github.com/uriotto) על פרויקט Supabase אמיתי (179 לקוחות, 540 הודעות, 13MB DB) — כולל debug ידני של 4 הבאגים שמתועדים למעלה.
+נוצר בהשראת [הפוסט הזה בלינקדאין על גיבוי עצמאי של Supabase](https://www.linkedin.com/posts/shramr_supabase-db-backup-%D7%92%D7%99%D7%91%D7%95%D7%99-%D7%93%D7%90%D7%98%D7%94-ugcPost-7459467479203893248-ady1/). היישום הזה נבנה ונבדק ב-production על ידי [@uriotto](https://github.com/uriotto) על פרויקט Supabase אמיתי (179 לקוחות, 540 הודעות, 13MB DB) — כולל debug ידני של 4 הבאגים שמתועדים למעלה.

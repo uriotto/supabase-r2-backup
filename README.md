@@ -126,4 +126,4 @@ MIT. Copy freely, adapt freely.
 
 ## Credits
 
-Inspired by [this Hebrew guide on independent Supabase backups](https://github.com/cucoleadan/supabase-to-r2-backup) (May 2026). This implementation was built and tested in production by [@uriotto](https://github.com/uriotto) on a real Supabase project (179 clients, 540 messages, 13MB DB) with hands-on debugging of the 4 issues documented above.
+Inspired by [this Hebrew LinkedIn post on independent Supabase backups](https://www.linkedin.com/posts/shramr_supabase-db-backup-%D7%92%D7%99%D7%91%D7%95%D7%99-%D7%93%D7%90%D7%98%D7%94-ugcPost-7459467479203893248-ady1/). This implementation was built and tested in production by [@uriotto](https://github.com/uriotto) on a real Supabase project (179 clients, 540 messages, 13MB DB) with hands-on debugging of the 4 issues documented above.
