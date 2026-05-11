@@ -104,11 +104,14 @@ We hit 4 distinct bugs building this. They're all documented in [docs/troublesho
 
 ## With Claude Code
 
-If you use [Claude Code](https://claude.com/claude-code), there's a matching skill that walks you through setup interactively. Install via:
+If you use [Claude Code](https://claude.com/claude-code), there's a matching skill that walks you through setup interactively. Install it:
 
 ```bash
-# (Skill installation method TBD — file an issue if you want this)
+git clone https://github.com/uriotto/supabase-r2-backup.git
+cp -r supabase-r2-backup/.claude/skills/supabase-r2-backup ~/.claude/skills/
 ```
+
+Then in any Claude Code session, just ask: "set up a Supabase backup to R2" and the skill will guide you through the whole flow.
 
 ## Contributing
 

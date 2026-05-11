@@ -100,6 +100,17 @@ PGPASSWORD=... pg_restore --clean --no-owner --no-acl \
 3. "AccessDenied" בהעלאה ל-R2 → token מוגבל ל-bucket. אנחנו משתמשים בדגל `--s3-no-check-bucket`.
 4. "unsupported version (1.16)" → אי-התאמת גרסה של pg_restore. אנחנו מכריחים PG17 ב-PATH.
 
+## עם Claude Code
+
+אם אתה משתמש ב-[Claude Code](https://claude.com/claude-code), יש סקיל תואם שמדריך אותך אינטראקטיבית בכל ההגדרה. התקנה:
+
+```bash
+git clone https://github.com/uriotto/supabase-r2-backup.git
+cp -r supabase-r2-backup/.claude/skills/supabase-r2-backup ~/.claude/skills/
+```
+
+אחר כך בכל סשן של Claude Code פשוט תבקש: "תגדיר לי גיבוי Supabase ל-R2" והסקיל ילך איתך על כל התהליך.
+
 ## רישיון
 
 MIT. חופשי לעתק, להתאים.
