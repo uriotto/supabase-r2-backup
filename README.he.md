@@ -1,3 +1,5 @@
+[English](README.md) · [עברית](README.he.md)
+
 # Supabase → Cloudflare R2 Backup
 
 > גיבוי יומי אוטומטי וחינמי ל-Supabase Postgres. אפס תשתית, אפס עלות חודשית. נבנה ונבדק ב-production.
@@ -22,19 +24,21 @@
 
 ## ה-Stack
 
-| רכיב | למה |
-|---|---|
-| GitHub Actions | חינם 2000 דק'/חודש (אפילו ב-private), cron אמין |
-| `pg_dump` (PG17) | סטנדרטי, נתמך היטב, דחוס `--format=custom` |
-| Cloudflare R2 | 10GB חינם, **אפס דמי egress** (שלא כמו S3), תואם S3 |
-| `rclone` | הכלי הכי טוב להעלאה ל-S3 |
+| רכיב             | למה                                                 |
+| ---------------- | --------------------------------------------------- |
+| GitHub Actions   | חינם 2000 דק'/חודש (אפילו ב-private), cron אמין     |
+| `pg_dump` (PG17) | סטנדרטי, נתמך היטב, דחוס `--format=custom`          |
+| Cloudflare R2    | 10GB חינם, **אפס דמי egress** (שלא כמו S3), תואם S3 |
+| `rclone`         | הכלי הכי טוב להעלאה ל-S3                            |
 
 ## התחלה מהירה (15 דקות)
 
 ### 1. צור bucket ב-Cloudflare R2
-ראה [docs/setup-r2.md](docs/setup-r2.md). תצטרך: שם bucket, Account ID, Access Key ID, Secret Access Key.
+
+ראה [docs/setup-r2.he.md](docs/setup-r2.he.md). תצטרך: שם bucket, Account ID, Access Key ID, Secret Access Key.
 
 ### 2. שלוף את פרטי החיבור של Supabase
+
 Supabase Dashboard → Connect → **Session pooler** → טאב URI. תצטרך: host, user, password.
 
 ⚠️ Supabase **לא מציג** את סיסמת ה-DB ב-UI. מצא אותה ב-`.env.local` של הפרויקט, ב-Vercel env vars, או במנהל הסיסמאות. אם איבדת — אפשר Reset (אבל זה ישבור חיבורים קיימים).
@@ -43,15 +47,15 @@ Supabase Dashboard → Connect → **Session pooler** → טאב URI. תצטרך
 
 ב-`Settings → Secrets and variables → Actions` הוסף:
 
-| Name | דוגמה |
-|---|---|
-| `SUPABASE_DB_HOST` | `aws-1-eu-central-1.pooler.supabase.com` |
-| `SUPABASE_DB_USER` | `postgres.YOUR_PROJECT_REF` |
-| `SUPABASE_DB_PASSWORD` | סיסמה גולמית (בלי URL encoding) |
-| `R2_ACCOUNT_ID` | מ-Cloudflare dashboard |
-| `R2_ACCESS_KEY_ID` | מ-R2 API token |
-| `R2_SECRET_ACCESS_KEY` | מ-R2 API token |
-| `R2_BUCKET` | שם ה-bucket שלך |
+| Name                   | דוגמה                                    |
+| ---------------------- | ---------------------------------------- |
+| `SUPABASE_DB_HOST`     | `aws-1-eu-central-1.pooler.supabase.com` |
+| `SUPABASE_DB_USER`     | `postgres.YOUR_PROJECT_REF`              |
+| `SUPABASE_DB_PASSWORD` | סיסמה גולמית (בלי URL encoding)          |
+| `R2_ACCOUNT_ID`        | מ-Cloudflare dashboard                   |
+| `R2_ACCESS_KEY_ID`     | מ-R2 API token                           |
+| `R2_SECRET_ACCESS_KEY` | מ-R2 API token                           |
+| `R2_BUCKET`            | שם ה-bucket שלך                          |
 
 ### 4. העתק את ה-workflow
 
@@ -73,9 +77,10 @@ gh run watch
 
 ## שחזור גיבוי
 
-ראה [docs/restore.md](docs/restore.md).
+ראה [docs/restore.he.md](docs/restore.he.md).
 
 בקצרה:
+
 ```bash
 # הורד מ-R2 (דרך הממשק של Cloudflare או דרך rclone)
 rclone copy r2:YOUR_BUCKET/your-repo-2026-01-15.dump .
@@ -88,7 +93,7 @@ PGPASSWORD=... pg_restore --clean --no-owner --no-acl \
 
 ## תקלות נפוצות
 
-נתקלנו ב-4 באגים שונים בעת הבנייה. כולם מתועדים ב-[docs/troubleshooting.md](docs/troubleshooting.md):
+נתקלנו ב-4 באגים שונים בעת הבנייה. כולם מתועדים ב-[docs/troubleshooting.he.md](docs/troubleshooting.he.md):
 
 1. "could not translate host name" → סיסמה עם תווים מיוחדים. הפתרון כבר מובנה: שימוש ב-`PGPASSWORD` env var במקום URL.
 2. "password authentication failed" → אתה מנחש את הסיסמה. תמצא אותה ב-`.env.local` או ב-env vars.

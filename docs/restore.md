@@ -11,6 +11,7 @@ The whole point of backups is restore. Here's how.
 ## Step 1: Get the backup file
 
 ### Option A — Cloudflare web UI
+
 1. [Cloudflare dashboard](https://dash.cloudflare.com) → R2 → your bucket
 2. Find the backup you want (`YOUR_REPO-YYYY-MM-DD.dump`)
 3. Click → **Download**
@@ -18,6 +19,7 @@ The whole point of backups is restore. Here's how.
 ### Option B — rclone (faster, scriptable)
 
 First-time rclone setup:
+
 ```bash
 rclone config
 # n (new remote)
@@ -31,6 +33,7 @@ rclone config
 ```
 
 Then:
+
 ```bash
 rclone copy r2:YOUR_BUCKET/YOUR_REPO-2026-01-15.dump .
 ```
@@ -42,6 +45,7 @@ pg_restore --list YOUR_REPO-2026-01-15.dump | head -30
 ```
 
 You should see lines like:
+
 ```
 4306; 0 17361 TABLE DATA public clients postgres
 4307; 0 17372 TABLE DATA public conversations postgres
@@ -49,6 +53,7 @@ You should see lines like:
 ```
 
 If you see `unsupported version (1.16)`, you need pg_restore 17. Install:
+
 ```bash
 # macOS
 brew install postgresql@17
@@ -102,6 +107,7 @@ PGPASSWORD=test psql -h localhost -U postgres -c "\dt"
 ## Step 4: Verify restored data
 
 After restore, run some sanity checks:
+
 ```sql
 SELECT count(*) FROM clients;
 SELECT count(*) FROM messages;
@@ -111,18 +117,22 @@ SELECT max(created_at) FROM messages;  -- should match the backup date
 ## Common errors
 
 ### `pg_restore: error: connection to server ... failed`
+
 - Wrong host/user/password
 - Network issue (try from another machine)
 
 ### `permission denied for schema public`
+
 - Use `--no-owner --no-acl` flags
 - Supabase Free has different role permissions than self-hosted Postgres
 
 ### `relation "X" already exists`
+
 - Add `--clean` to drop existing objects before restore
 - Or use `--if-exists` for safer cleanup
 
 ### Tables exist but are empty
+
 - Ensure you used `--format=custom` in the original `pg_dump`
 - Check that the dump file size > 1KB (`ls -lh <file>.dump`)
 

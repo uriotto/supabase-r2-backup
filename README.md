@@ -1,3 +1,5 @@
+[English](README.md) · [עברית](README.he.md)
+
 # Supabase → Cloudflare R2 Backup
 
 > Free, automated daily backups for Supabase Postgres. Zero infrastructure. Zero monthly cost. Built and battle-tested in production.
@@ -22,19 +24,21 @@
 
 ## Stack
 
-| Component | Why |
-|---|---|
-| GitHub Actions | Free 2000 min/month (private repos), reliable cron |
-| `pg_dump` (PG17) | Standard, well-supported, compressed `--format=custom` |
-| Cloudflare R2 | 10GB free, **zero egress fees** (unlike S3), S3-compatible |
-| `rclone` | Best-in-class S3 uploader |
+| Component        | Why                                                        |
+| ---------------- | ---------------------------------------------------------- |
+| GitHub Actions   | Free 2000 min/month (private repos), reliable cron         |
+| `pg_dump` (PG17) | Standard, well-supported, compressed `--format=custom`     |
+| Cloudflare R2    | 10GB free, **zero egress fees** (unlike S3), S3-compatible |
+| `rclone`         | Best-in-class S3 uploader                                  |
 
 ## Quickstart (15 minutes)
 
 ### 1. Create Cloudflare R2 bucket
+
 See [docs/setup-r2.md](docs/setup-r2.md). You'll need: bucket name, Account ID, Access Key ID, Secret Access Key.
 
 ### 2. Get your Supabase DB credentials
+
 Supabase Dashboard → Connect → **Session pooler** → URI tab. You'll need: host, user, password.
 
 ⚠️ Supabase **doesn't show** your DB password in the UI. Find it in your project's `.env.local`, Vercel env vars, or your password manager. If lost, you can Reset (but it'll break existing connections).
@@ -43,15 +47,15 @@ Supabase Dashboard → Connect → **Session pooler** → URI tab. You'll need: 
 
 In `Settings → Secrets and variables → Actions` add:
 
-| Name | Example |
-|---|---|
-| `SUPABASE_DB_HOST` | `aws-1-eu-central-1.pooler.supabase.com` |
-| `SUPABASE_DB_USER` | `postgres.YOUR_PROJECT_REF` |
-| `SUPABASE_DB_PASSWORD` | Raw password (no URL encoding) |
-| `R2_ACCOUNT_ID` | From Cloudflare dashboard |
-| `R2_ACCESS_KEY_ID` | From R2 API token |
-| `R2_SECRET_ACCESS_KEY` | From R2 API token |
-| `R2_BUCKET` | Your bucket name |
+| Name                   | Example                                  |
+| ---------------------- | ---------------------------------------- |
+| `SUPABASE_DB_HOST`     | `aws-1-eu-central-1.pooler.supabase.com` |
+| `SUPABASE_DB_USER`     | `postgres.YOUR_PROJECT_REF`              |
+| `SUPABASE_DB_PASSWORD` | Raw password (no URL encoding)           |
+| `R2_ACCOUNT_ID`        | From Cloudflare dashboard                |
+| `R2_ACCESS_KEY_ID`     | From R2 API token                        |
+| `R2_SECRET_ACCESS_KEY` | From R2 API token                        |
+| `R2_BUCKET`            | Your bucket name                         |
 
 See [docs/setup-secrets.md](docs/setup-secrets.md) for screenshots.
 
@@ -78,6 +82,7 @@ That's it. Daily backups will run at 03:00 UTC. Change the cron in the workflow 
 See [docs/restore.md](docs/restore.md).
 
 TL;DR:
+
 ```bash
 # Download from R2 (via Cloudflare dashboard, or rclone)
 rclone copy r2:YOUR_BUCKET/your-repo-2026-01-15.dump .
@@ -108,6 +113,7 @@ If you use [Claude Code](https://claude.com/claude-code), there's a matching ski
 ## Contributing
 
 PRs welcome, especially for:
+
 - Other storage backends (S3, GCS, B2)
 - Other DB providers (Neon, Railway, RDS)
 - Internationalized docs

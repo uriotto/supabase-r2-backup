@@ -1,17 +1,19 @@
 # Troubleshooting
 
-4 הבאגים שנתקלנו בהם במהלך הקמת המערכת ב-production, ואיך לפתור אותם.
+The 4 bugs we hit setting this up in production, and how to fix them.
 
-## בעיה 1: `could not translate host name "X@host..." to address`
+## Bug 1: `could not translate host name "X@host..." to address`
 
-**שגיאה מלאה (דוגמה)**:
+**Full error (example)**:
+
 ```
 pg_dump: error: could not translate host name "4050@aws-1-eu-central-1.pooler.supabase.com" to address: Name or service not known
 ```
 
-**סיבה**: סיסמת ה-DB מכילה תו `@` (או תווים מיוחדים אחרים). כשמשתמשים ב-connection string URL, ה-parser מבולבל ומפצל לא נכון על ה-`@`.
+**Cause**: Your DB password contains an `@` character (or other special characters). When using a connection-string URL, the parser gets confused and splits incorrectly on the `@`.
 
-**פתרון**: השתמש ב-`PGPASSWORD` env var ולא ב-URL. בתבנית שלנו זה כבר מוטמע:
+**Fix**: Use the `PGPASSWORD` env var instead of embedding the password in a URL. Our template already does this:
+
 ```yaml
 env:
   PGHOST: ${{ secrets.SUPABASE_DB_HOST }}
@@ -19,46 +21,51 @@ env:
   PGPASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
 ```
 
-⚠️ **תקלה לא לנסות לפתור**: URL encoding (`@` → `%40`). זה אמור לעבוד, אבל בשטח מצאנו ש-libpq לא תמיד מפענח נכון.
+⚠️ **Don't try to fix this with URL encoding** (`@` → `%40`). In theory it should work, but in practice we found libpq doesn't always decode properly.
 
-## בעיה 2: `password authentication failed for user "postgres"` למרות שהסיסמה "נכונה"
+## Bug 2: `password authentication failed for user "postgres"` despite "correct" password
 
-**סיבה**: המשתמש מנסה להמציא או לנחש את הסיסמה. Supabase **לעולם לא מציג** את הסיסמה ב-dashboard — רק `[YOUR-PASSWORD]` placeholder.
+**Cause**: You're guessing or inventing the password. Supabase **never displays** the password in the dashboard — only `[YOUR-PASSWORD]` as a placeholder.
 
-**איך למצוא את הסיסמה האמיתית**:
-1. בקובץ `.env.local` של הפרויקט — חפש שורה שמתחילה ב-`# DB password:` (או דומה)
-2. ב-Vercel/Render env vars — חפש `DATABASE_URL` או `POSTGRES_URL` — הסיסמה היא החלק בין `:` ל-`@` ב-URL
-3. ב-1Password / מנהל סיסמאות אחר
-4. אם לא נמצאת — **Reset database password** ב-Supabase (יחייב לעדכן בכל המקומות שמשתמשים בה)
+**How to find the real password**:
 
-⚠️ **תקלה לא לנסות לפתור**: לבקש מהמשתמש "מה הסיסמה" בלי לחפש קודם בקבצים. רוב המשתמשים יזרקו ניחוש.
+1. Project's `.env.local` — look for a `# DB password:` comment or `DATABASE_URL=...:PASSWORD@...`
+2. Vercel/Render env vars — `DATABASE_URL` or `POSTGRES_URL` (password is between `:` and `@` in the URL)
+3. Password manager (1Password, etc.)
+4. If lost — **Reset database password** in Supabase (will break existing connections — you'll need to update everywhere)
 
-## בעיה 3: `S3: CreateBucket, StatusCode: 403, AccessDenied` בהעלאה ל-R2
+⚠️ **Don't** just ask the user "what's the password" without searching files first. Most users will throw out a guess.
 
-**שגיאה מלאה**:
+## Bug 3: `S3: CreateBucket, StatusCode: 403, AccessDenied` on R2 upload
+
+**Full error**:
+
 ```
 ERROR : Failed to copy: failed to prepare upload: operation error S3: CreateBucket, https response error StatusCode: 403, api error AccessDenied: Access Denied
 ```
 
-**סיבה**: ברירת המחדל של rclone היא לבדוק שה-bucket קיים לפני העלאה — באמצעות `CreateBucket` (idempotent operation). אם ה-API token שלך מוגבל רק לכתיבה ב-bucket ספציפי (כפי שמומלץ ב-security), אין לו הרשאה ל-`CreateBucket`.
+**Cause**: rclone's default behavior is to check the bucket exists before uploading — via `CreateBucket` (an idempotent op). If your API token is scoped to a specific bucket only (as recommended for security), it doesn't have permission to call `CreateBucket`.
 
-**פתרון**: הוסף `--s3-no-check-bucket` ל-rclone:
+**Fix**: Add `--s3-no-check-bucket` to rclone:
+
 ```bash
 rclone copy "${FILENAME}" "r2:bucket-name/" --s3-no-check-bucket
 ```
 
-זה כבר מוטמע בתבנית שלנו.
+Already in our template.
 
-## בעיה 4: `pg_restore: error: unsupported version (1.16) in file header`
+## Bug 4: `pg_restore: error: unsupported version (1.16) in file header`
 
-**שגיאה מלאה**:
+**Full error**:
+
 ```
 pg_restore: error: unsupported version (1.16) in file header
 ```
 
-**סיבה**: ב-GitHub Actions runner של Ubuntu, יש PostgreSQL client ישן מותקן כברירת מחדל (לרוב גרסה 14 או 15). ה-PATH מצביע עליו, אבל ה-`pg_dump` החדש (גרסה 17 שהתקנו) כותב פורמט שגרסאות ישנות לא יודעות לקרוא.
+**Cause**: GitHub Actions' Ubuntu runner has an older PostgreSQL client preinstalled (typically version 14 or 15). PATH points to it, but the new `pg_dump` (version 17 you just installed) writes a format that older versions can't read.
 
-**פתרון**: לכפות את ה-PATH של PostgreSQL 17 ראשון:
+**Fix**: Force PostgreSQL 17 first in PATH:
+
 ```yaml
 - name: Install PostgreSQL 17 client
   run: |
@@ -66,21 +73,22 @@ pg_restore: error: unsupported version (1.16) in file header
     echo "/usr/lib/postgresql/17/bin" >> $GITHUB_PATH
 ```
 
-זה כבר מוטמע בתבנית שלנו.
+Already in our template.
 
-## בעיה 5 (אזהרה): שיתוף סיסמת ה-DB בצ׳אט
+## Bug 5 (warning): Sharing DB password in chat
 
-**הקשר**: בזמן הצבת ה-secret ב-GitHub, יש פיתוי להדביק את ה-connection string המלא בצ'אט עם Claude לבדיקה.
+**Context**: While setting up the GitHub Secret, there's a temptation to paste the full connection string into a chat (with Claude or anyone) for verification.
 
-**הסיכון**: היסטוריית הצ'אט נשמרת. אם הצ'אט אי פעם ידלוף — הסיסמה דלפה.
+**Risk**: Chat history is retained. If the chat ever leaks — your password leaked too.
 
-**מה לעשות אם זה קרה**:
-1. השלם את ההגדרה (שיהיה גיבוי לפני סיבוב)
-2. ב-Supabase: **Reset database password**
-3. עדכן את הסיסמה החדשה בכל המקומות:
+**What to do if this happened**:
+
+1. Complete the setup first (so you have a backup before rotating)
+2. In Supabase: **Reset database password**
+3. Update the new password everywhere:
    - GitHub Secret `SUPABASE_DB_PASSWORD`
    - Vercel / Render env vars
-   - קובץ `.env.local` מקומי
-   - מנהל סיסמאות
+   - Local `.env.local`
+   - Password manager
 
-**איך למנוע**: כשמדריכים את המשתמש, אמור במפורש "אל תשלח את הסיסמה אליי בצ'אט — רק תאשר שהיא אצלך."
+**How to prevent**: When guiding users, explicitly say "Don't paste the password to me — just confirm you have it."

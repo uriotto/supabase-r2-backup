@@ -43,6 +43,7 @@ This means: every backup older than 10 days gets auto-deleted. You always have ~
 ## 5. Save the credentials (THIS IS YOUR ONLY CHANCE)
 
 Cloudflare shows you 3 values **once**:
+
 - **Access Key ID** — looks like `abc123def456...`
 - **Secret Access Key** — looks like `xyz789...` (long random string)
 - **Endpoint** (or **Jurisdiction-specific endpoint**) — looks like `https://YOUR_ACCOUNT_ID.r2.cloudflarestorage.com`
